@@ -2,10 +2,12 @@
 @using System.Runtime.InteropServices
 @using System.IO
 @using System.Diagnostics
+@using System.Globalization
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
     var process = Process.GetCurrentProcess();
+    var nfi = new CultureInfo("en-US", false).NumberFormat;
 }
 
 <div class="text-center">
@@ -27,20 +29,24 @@
             <td>CPU cores</td>
             <td>@Environment.ProcessorCount</td>
         </tr>
-    @if (RuntimeInformation.OSDescription.StartsWith("Linux") && Directory.Exists("/sys/fs/cgroup/memory"))
-    {
         <tr>
-            <td>cgroup memory usage</td>
-            <td>@System.IO.File.ReadAllLines("/sys/fs/cgroup/memory/memory.usage_in_bytes")[0]</td>
+            <td>Uptime</td>
+            <td>@(DateTime.Now - process.StartTime)</td>
         </tr>
-    }
+        @if (RuntimeInformation.OSDescription.StartsWith("Linux") && Directory.Exists("/sys/fs/cgroup/memory"))
+        {
+            <tr>
+                <td>cgroup memory usage</td>
+                <td>@System.IO.File.ReadAllLines("/sys/fs/cgroup/memory/memory.usage_in_bytes")[0]</td>
+            </tr>
+        }
         <tr>
             <td>Memory, current usage (bytes)</td>
-            <td>@process.WorkingSet64</td>
+            <td>@process.WorkingSet64.ToString("N0")</td>
         </tr>
         <tr>
             <td>Memory, max available (bytes)</td>
-            <td>@process.MaxWorkingSet</td>
-        </tr>    
+            <td>@process.MaxWorkingSet.ToString("N0")</td>
+        </tr>
     </table>
 </div>
